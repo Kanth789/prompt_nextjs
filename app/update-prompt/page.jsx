@@ -62,7 +62,7 @@ const Prompt = () => {
   );
 };
 
-export function EditPrompt() {
+export default  EditPrompt = () => {
   return (
     <Suspense>
       <Prompt />
