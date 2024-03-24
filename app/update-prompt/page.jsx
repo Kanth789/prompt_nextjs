@@ -15,24 +15,36 @@ const Prompt = () => {
   });
 
   useEffect(() => {
-    const getPromptDeatils = async () => {
-      const response = await fetch(`/api/prompt/${promptId}`);
-      const data = await response.json();
-
-      setPost({
-        prompt: data.prompt,
-        tag: data.tag,
-      });
+    const getPromptDetails = async () => {
+      try {
+        const response = await fetch(`/api/prompt/${promptId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setPost({
+            prompt: data.prompt,
+            tag: data.tag,
+          });
+        } else {
+          console.error("Failed to fetch prompt details");
+        }
+      } catch (error) {
+        console.error("Error fetching prompt details:", error);
+      }
     };
-    getPromptDeatils();
+    if (promptId) {
+      getPromptDetails();
+    } else {
+      console.error("Prompt id not found");
+    }
   }, [promptId]);
 
   const updatePrompt = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    if(!promptId){
-      return alert('Prompt id not found')
-    }else{
+    if (!promptId) {
+      alert("Prompt id not found");
+      return;
+    }
     try {
       const response = await fetch(`/api/prompt/${promptId}`, {
         method: "PATCH",
@@ -43,29 +55,33 @@ const Prompt = () => {
       });
       if (response.ok) {
         router.push("/");
+      } else {
+        console.error("Failed to update prompt");
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error updating prompt:", error);
     } finally {
       setSubmitting(false);
     }
-  }
   };
+
   return (
     <Form
       type="Edit"
       post={post}
       setPost={setPost}
       submitting={submitting}
-      handlSubmit={updatePrompt}
+      handleSubmit={updatePrompt}
     />
   );
 };
 
-export default  EditPrompt = () => {
+const EditPrompt = () => {
   return (
     <Suspense>
       <Prompt />
     </Suspense>
-  )
-}
+  );
+};
+
+export default EditPrompt;
